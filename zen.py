@@ -66,12 +66,13 @@ class Node:
             else:
                 global_variables[self.words[1]] = self.words[2]
         elif start == "display":
-            i = 1
-            lent = len(self.words)
+            i = 0
             string = list(self.words)
+            string.pop(0)
+            lent = len(string)
             while i < lent:
                 if "$" in string[i]:
-                    string[i] = convert_variable(self.words[i])
+                    string[i] = convert_variable(self.words[i + 1])
                 i += 1
             print(" ".join(string))
         elif start == "get":
@@ -149,6 +150,8 @@ class Node:
                 else:
                     if self.else_statement:
                         self.else_statement.run_block()
+        elif start == "com":
+            pass
 
 
 class Tree:

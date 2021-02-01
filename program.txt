@@ -1,9 +1,10 @@
 assign opening str y is:
-assign y math 3 + 2
+assign y math 3 + 2 * 2
 assign x 0
 display $opening $y
-if $x != 999
-  display please enter a number
+com comments work!
+if $x != exit
+  display please enter a number, or 'exit' to exit
   get x
   if $x = $y
     display your input is equal to y
@@ -12,5 +13,3 @@ if $x != 999
   end
   repeat
 end
-assign x math $x + 1
-display your input plus one is $x
