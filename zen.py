@@ -116,11 +116,21 @@ class Node:
                 result = q_line.pop(0)
                 if "$" in result:
                     result = convert_variable(result)
+                    if type(result) == list:
+                        if q_line[0] and "i/" in q_line[0]:
+                            j = q_line[0].replace("i/", "")
+                            result = result[int(j)]
                 result = float(result)
                 while q_line:
                     if "$" in q_line[0]:
                         q_line[0] = convert_variable(q_line[0])
+                        if type(q_line[0]) == list:
+                            if q_line[1] and "i/" in q_line[1]:
+                                j = q_line[1].replace("i/", "")
+                                q_line[1] = q_line[1][int(j)]
                     op = q_line.pop(0)
+                    if not q_line:
+                        break
                     number = float(q_line.pop(0))
                     if op == "+":
                         result += number
@@ -135,6 +145,15 @@ class Node:
                 if round(result) == result:
                     result = round(result)
                 global_variables[name] = str(result)
+            elif self.words[2] == "list":
+                q_line = list(self.words)
+                q_line.pop(0)
+                name = q_line.pop(0)
+                q_line.pop(0)
+                result = []
+                for i in q_line:
+                    result.append(convert_variable(i))
+                global_variables[name] = result
             else:
                 global_variables[self.words[1]] = self.words[2]
         elif start == "display":
@@ -145,6 +164,13 @@ class Node:
             while i < lent:
                 if "$" in string[i]:
                     string[i] = convert_variable(self.words[i + 1])
+                    if type(string[i]) == list:
+                        if string[i + 1] and "i/" in string[i + 1]:
+                            j = string[i + 1].replace("i/", "")
+                            string[i] = string[i][int(j)]
+                            string[i + 1] = "\b"
+                        else:
+                            string[i] = " ".join(string[i])
                 i += 1
             print(" ".join(string))
         elif start == "get":
@@ -184,7 +210,7 @@ class Tree:
                 print(child)
 
 
-my_file = open("program_2.txt", "r")
+my_file = open("program_3.txt", "r")
 code = []
 while True:
     cur_line = my_file.readline()
