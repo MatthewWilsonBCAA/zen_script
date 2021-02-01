@@ -1,0 +1,16 @@
+assign x 0
+assign y 0
+assign MAX_X 5
+assign MAX_Y 5
+if $x < $MAX_X
+  com
+  display loop
+  if $y < $MAX_Y
+    display X: $x , Y: $y
+    assign y math $y + 1
+    repeat
+  end
+  assign x math $x + 1
+  assign y 0
+  repeat
+end

@@ -15,6 +15,7 @@ class Node:
         self.index = index
         self.parent = None
         self.else_statement = None
+        self.has_children = False
         self.tree = tree
 
     def __str__(self):
@@ -29,27 +30,28 @@ class Node:
             i += 1
 
     def interp(self):
-        # print(self, ":", self.parent)
         start = self.words[0]
         if start == "assign":
             if self.words[2] == "str":
-                self.words.pop(0)
-                name = self.words.pop(0)
-                self.words.pop(0)
-                global_variables[name] = " ".join(self.words)
+                string = list(self.words)
+                string.pop(0)
+                name = string.pop(0)
+                string.pop(0)
+                global_variables[name] = " ".join(string)
             elif self.words[2] == "math":
-                self.words.pop(0)
-                name = self.words.pop(0)
-                self.words.pop(0)
-                result = self.words.pop(0)
+                q_line = list(self.words)
+                q_line.pop(0)
+                name = q_line.pop(0)
+                q_line.pop(0)
+                result = q_line.pop(0)
                 if "$" in result:
                     result = convert_variable(result)
                 result = float(result)
-                while self.words:
-                    if "$" in self.words[0]:
-                        self.words[0] = convert_variable(self.words[0])
-                    op = self.words.pop(0)
-                    number = float(self.words.pop(0))
+                while q_line:
+                    if "$" in q_line[0]:
+                        q_line[0] = convert_variable(q_line[0])
+                    op = q_line.pop(0)
+                    number = float(q_line.pop(0))
                     if op == "+":
                         result += number
                     elif op == "-":
@@ -81,15 +83,16 @@ class Node:
             self.run_block()
         elif start == "repeat":
             self.tree.i = self.parent.index - 1
+            # print("index", self.tree.i, "where parent is", self.parent)
         elif start == "if":
             i = self.index + 1
             c = 1
             self.found_else = False
-            while True:
-                if (
-                    self.tree.children[i].words[0] == "if"
-                    or self.tree.children[i].words[0] == "while"
-                ):
+            while self.has_children == False:
+                if not self.tree.children[i].words:
+                    i += 1
+                    continue
+                if self.tree.children[i].words[0] == "if":
                     c += 1
                 elif (
                     self.tree.children[i].words[0] == "else"
@@ -108,6 +111,7 @@ class Node:
                 else:
                     self.tree.children[i].parent = self.else_statement
                 i += 1
+            self.has_children = True
             left = self.words[1]
             right = self.words[3]
             if "$" in self.words[1]:
@@ -171,13 +175,13 @@ class Tree:
             self.i += 1
 
 
-my_file = open("program.txt", "r")
+my_file = open("program_2.txt", "r")
 code = []
 while True:
     cur_line = my_file.readline()
     if not cur_line:
         break
+    cur_line = cur_line.strip()
     code.append(cur_line)
-
 new_tree = Tree(code)
 new_tree.run_program()
