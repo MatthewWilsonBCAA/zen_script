@@ -29,6 +29,76 @@ class Node:
                 self.tree.children[i].interp()
             i += 1
 
+    def if_block(self):
+        i = self.index + 1
+        c = 1
+        self.found_else = False
+        while self.has_children == False:
+            if not self.tree.children[i].words or self.tree.children[i] == self:
+                i += 1
+                continue
+            if self.tree.children[i].words[0] == "if":
+                c += 1
+            elif (
+                self.tree.children[i].words[0] == "else"
+                and self.found_else == False
+                and c == 1
+            ):
+                self.else_statement = self.tree.children[i]
+                self.found_else = True
+            elif self.tree.children[i].words[0] == "end":
+                c -= 1
+                if c == 0:
+                    self.has_children = True
+                # print(self.tree.children[i])
+            if not self.found_else:
+                self.tree.children[i].parent = self
+            else:
+                self.tree.children[i].parent = self.else_statement
+            i += 1
+        left = self.words[1]
+        right = self.words[3]
+        if "$" in self.words[1]:
+            left = convert_variable(self.words[1])
+        if "$" in self.words[3]:
+            right = convert_variable(self.words[3])
+        if self.words[2] == "=":
+            if left == right:
+                self.run_block()
+            else:
+                if self.else_statement:
+                    self.else_statement.run_block()
+        if self.words[2] == "!=":
+            if left != right:
+                self.run_block()
+            else:
+                if self.else_statement:
+                    self.else_statement.run_block()
+        if self.words[2] == ">":
+            if float(left) > float(right):
+                self.run_block()
+            else:
+                if self.else_statement:
+                    self.else_statement.run_block()
+        if self.words[2] == "<":
+            if float(left) < float(right):
+                self.run_block()
+            else:
+                if self.else_statement:
+                    self.else_statement.run_block()
+        if self.words[2] == ">=":
+            if float(left) >= float(right):
+                self.run_block()
+            else:
+                if self.else_statement:
+                    self.else_statement.run_block()
+        if self.words[2] == "<=":
+            if float(left) <= float(right):
+                self.run_block()
+            else:
+                if self.else_statement:
+                    self.else_statement.run_block()
+
     def interp(self):
         start = self.words[0]
         if start == "assign":
@@ -82,78 +152,10 @@ class Node:
         elif start == "else":
             self.run_block()
         elif start == "repeat":
-            self.tree.i = self.parent.index - 1
-            # print("index", self.tree.i, "where parent is", self.parent)
+            self.tree.i = self.parent.index
+            self.parent.interp()
         elif start == "if":
-            i = self.index + 1
-            c = 1
-            self.found_else = False
-            while self.has_children == False:
-                if not self.tree.children[i].words:
-                    i += 1
-                    continue
-                if self.tree.children[i].words[0] == "if":
-                    c += 1
-                elif (
-                    self.tree.children[i].words[0] == "else"
-                    and self.found_else == False
-                    and c == 1
-                ):
-                    self.else_statement = self.tree.children[i]
-                    self.found_else = True
-                elif self.tree.children[i].words[0] == "end":
-                    c -= 1
-                    if c == 0:
-                        break
-                # print(self.tree.children[i])
-                if not self.found_else:
-                    self.tree.children[i].parent = self
-                else:
-                    self.tree.children[i].parent = self.else_statement
-                i += 1
-            self.has_children = True
-            left = self.words[1]
-            right = self.words[3]
-            if "$" in self.words[1]:
-                left = convert_variable(self.words[1])
-            if "$" in self.words[3]:
-                right = convert_variable(self.words[3])
-            if self.words[2] == "=":
-                if left == right:
-                    self.run_block()
-                else:
-                    if self.else_statement:
-                        self.else_statement.run_block()
-            if self.words[2] == "!=":
-                if left != right:
-                    self.run_block()
-                else:
-                    if self.else_statement:
-                        self.else_statement.run_block()
-            if self.words[2] == ">":
-                if float(left) > float(right):
-                    self.run_block()
-                else:
-                    if self.else_statement:
-                        self.else_statement.run_block()
-            if self.words[2] == "<":
-                if float(left) < float(right):
-                    self.run_block()
-                else:
-                    if self.else_statement:
-                        self.else_statement.run_block()
-            if self.words[2] == ">=":
-                if float(left) >= float(right):
-                    self.run_block()
-                else:
-                    if self.else_statement:
-                        self.else_statement.run_block()
-            if self.words[2] == "<=":
-                if float(left) <= float(right):
-                    self.run_block()
-                else:
-                    if self.else_statement:
-                        self.else_statement.run_block()
+            self.if_block()
         elif start == "com":
             pass
 
@@ -173,6 +175,13 @@ class Tree:
             if self.children[self.i].parent == None:
                 self.children[self.i].interp()
             self.i += 1
+
+    def show_tree(self):
+        for child in self.children:
+            if child.parent:
+                print(f"{child} <with parent> {child.parent}")
+            else:
+                print(child)
 
 
 my_file = open("program_2.txt", "r")
