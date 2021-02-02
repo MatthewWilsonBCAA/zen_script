@@ -32,10 +32,11 @@ def convert_variable(obj, var):
     if not "$" in var:
         return var
     scope = obj
-    print(scope)
+    print("SCOPE PARENT", scope)
     var = var.replace("$", "")
     while scope.parent:
         if var in scope.local_variables.keys():
+            print("SUCCESS")
             return scope.local_variables[var]
         elif not scope.parent:
             break
@@ -165,9 +166,8 @@ class Node:
             i = 3
             for item in item_list:
                 args = zen_functions[func].words
-                zen_functions[func].local_variables[args[i]] = convert_variable(
-                    zen_functions[func], item
-                )
+                j = convert_variable(self, item)
+                zen_functions[func].local_variables[args[i]] = j
                 i += 1
             zen_functions[func].run_block()
 
@@ -236,6 +236,12 @@ class Node:
             lent = len(string)
             while i < lent:
                 if "$" in string[i]:
+                    print(
+                        "PARENT VARS",
+                        self.parent.local_variables,
+                        "WORDS-I",
+                        self.words[i + 1],
+                    )
                     string[i] = convert_variable(self, self.words[i + 1])
                     if type(string[i]) == list:
                         if string[i + 1] and "i/" in string[i + 1]:

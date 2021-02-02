@@ -1,5 +1,5 @@
+assign y 50
 define ( my_fun x )
   display $x
 end
-assign y 50
 ( my_fun $y )
