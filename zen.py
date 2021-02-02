@@ -1,12 +1,51 @@
 global_variables = dict()
 
 
-def convert_variable(var):
+def static_display(obj, item_list):
+    i = 0
+    for item in item_list:
+        item_list[i] = convert_variable(obj, item)
+        if type(item_list[i]) == list:
+            try:
+                ind = int(item_list[i + 1].replace("i/", ""))
+                item_list[i] = item_list[i][ind]
+                item_list[i + 1] = "\b"
+            except:
+                raise TypeError(
+                    f"Line {obj.index+1}, attempt to print a list without referencing an index"
+                )
+        i += 1
+    print(" ".join(item_list))
+
+
+static_functions = dict()  # function calls will look like this:
+# ( function_name $args ... )
+static_functions["display"] = static_display
+zen_functions = dict()  # functions written in Zen by the end user!
+# definitions will look like this:
+# define ( function_name  *args ... )
+# ... code ...
+# end
+
+
+def convert_variable(obj, var):
+    if not "$" in var:
+        return var
+    scope = obj
+    print(scope)
     var = var.replace("$", "")
+    while scope.parent:
+        if var in scope.local_variables.keys():
+            return scope.local_variables[var]
+        elif not scope.parent:
+            break
+        else:
+            scope = scope.parent
+
     if var in global_variables.keys():
         return global_variables[var]
     else:
-        return var
+        raise NameError(f"Line {obj.index+1}, {var} not defined in any scope")
 
 
 class Node:
@@ -17,6 +56,7 @@ class Node:
         self.else_statement = None
         self.has_children = False
         self.tree = tree
+        self.local_variables = dict()
 
     def __str__(self):
         return " ".join(self.words)
@@ -28,6 +68,23 @@ class Node:
             if self.tree.children[i].parent == self:
                 self.tree.children[i].interp()
             i += 1
+
+    def define_block(self):
+        i = self.index + 1
+        c = 1
+        while self.has_children == False:
+            if not self.tree.children[i].words or self.tree.children[i] == self:
+                i += 1
+                continue
+            if self.tree.children[i].words[0] == "if":
+                c += 1
+            elif self.tree.children[i].words[0] == "end":
+                c -= 1
+                if c == 0:
+                    self.has_children = True
+            self.tree.children[i].parent = self
+            i += 1
+        zen_functions[self.words[2]] = self
 
     def if_block(self):
         i = self.index + 1
@@ -50,7 +107,6 @@ class Node:
                 c -= 1
                 if c == 0:
                     self.has_children = True
-                # print(self.tree.children[i])
             if not self.found_else:
                 self.tree.children[i].parent = self
             else:
@@ -59,9 +115,9 @@ class Node:
         left = self.words[1]
         right = self.words[3]
         if "$" in self.words[1]:
-            left = convert_variable(self.words[1])
+            left = convert_variable(self, self.words[1])
         if "$" in self.words[3]:
-            right = convert_variable(self.words[3])
+            right = convert_variable(self, self.words[3])
         if self.words[2] == "=":
             if left == right:
                 self.run_block()
@@ -99,6 +155,22 @@ class Node:
                 if self.else_statement:
                     self.else_statement.run_block()
 
+    def exec_function(self, item_list):
+        item_list.pop()
+        item_list.pop(0)
+        func = item_list.pop(0)
+        if func in static_functions.keys():
+            static_functions[func](self, item_list)
+        else:
+            i = 3
+            for item in item_list:
+                args = zen_functions[func].words
+                zen_functions[func].local_variables[args[i]] = convert_variable(
+                    zen_functions[func], item
+                )
+                i += 1
+            zen_functions[func].run_block()
+
     def interp(self):
         start = self.words[0]
         if start == "assign":
@@ -115,15 +187,16 @@ class Node:
                 q_line.pop(0)
                 result = q_line.pop(0)
                 if "$" in result:
-                    result = convert_variable(result)
+                    result = convert_variable(self, result)
                     if type(result) == list:
                         if q_line[0] and "i/" in q_line[0]:
                             j = q_line[0].replace("i/", "")
                             result = result[int(j)]
+                            q_line.pop(0)
                 result = float(result)
                 while q_line:
                     if "$" in q_line[0]:
-                        q_line[0] = convert_variable(q_line[0])
+                        q_line[0] = convert_variable(self, q_line[0])
                         if type(q_line[0]) == list:
                             if q_line[1] and "i/" in q_line[1]:
                                 j = q_line[1].replace("i/", "")
@@ -152,7 +225,7 @@ class Node:
                 q_line.pop(0)
                 result = []
                 for i in q_line:
-                    result.append(convert_variable(i))
+                    result.append(convert_variable(self, i))
                 global_variables[name] = result
             else:
                 global_variables[self.words[1]] = self.words[2]
@@ -163,7 +236,7 @@ class Node:
             lent = len(string)
             while i < lent:
                 if "$" in string[i]:
-                    string[i] = convert_variable(self.words[i + 1])
+                    string[i] = convert_variable(self, self.words[i + 1])
                     if type(string[i]) == list:
                         if string[i + 1] and "i/" in string[i + 1]:
                             j = string[i + 1].replace("i/", "")
@@ -182,6 +255,10 @@ class Node:
             self.parent.interp()
         elif start == "if":
             self.if_block()
+        elif start == "(":
+            self.exec_function(list(self.words))
+        elif start == "define":
+            self.define_block()
         elif start == "com":
             pass
 
@@ -210,7 +287,7 @@ class Tree:
                 print(child)
 
 
-my_file = open("program_3.txt", "r")
+my_file = open("program_4.txt", "r")
 code = []
 while True:
     cur_line = my_file.readline()

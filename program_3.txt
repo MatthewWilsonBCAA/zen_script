@@ -1,4 +1,4 @@
 assign my_list list 0 1 2 3 4 5
-display $my_list i/1 hero
 assign x math $my_list i/3
-display $x
+( display $my_list i/3 )
+( display hello world ) 
