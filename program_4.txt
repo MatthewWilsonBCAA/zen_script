@@ -8,13 +8,13 @@ assign y -1
 assign my_string str x in the local scope is
 
 if $y != 0
-( display please enter a number, or 0 to exit )
-get y
-assign bean ( my_fun $y $my_string )
-if $bean == 100
-( display your input was 50, wasn't it? )
+  ( display please enter a number, or 0 to exit )
+  get y
+  assign bean ( my_fun $y $my_string )
+  if $bean != 0
+    ( display now it is $bean )
+  end
+  repeat
 end
-( display now it is $bean )
-repeat
-end
+
 ( display get help )

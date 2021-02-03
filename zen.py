@@ -141,7 +141,7 @@ class Node:
             left = convert_variable(self, self.words[1])
         if "$" in self.words[3]:
             right = convert_variable(self, self.words[3])
-        if self.words[2] == "=":
+        if self.words[2] == "==":
             if left == right:
                 self.run_block()
             else:
