@@ -51,17 +51,32 @@ def convert_variable(obj, var):
     if not "$" in var:
         return var
     scope = obj
+    actual = None
+    print("SCOPE", scope, "PARENT", scope.parent)
+    if scope.parent == scope:
+        for item in scope.tree:
+            if item.else_statement == scope:
+                actual = item
+                break
     var = var.replace("$", "")
     reached_top = False
     looped_top = False
     while not looped_top:
+        if scope.parent == scope:
+            for item in scope.tree.children:
+                if item.else_statement == scope:
+                    actual = item
+                    break
         if var in scope.local_variables.keys():
             return scope.local_variables[var]
         if reached_top:
             looped_top = True
         if scope.parent:
-            scope = scope.parent
-        else:
+            if not actual:
+                scope = scope.parent
+            else:
+                scope = actual
+        elif scope.parent == None:
             reached_top = True
 
     if var in global_variables.keys():
@@ -296,7 +311,11 @@ class Node:
         elif start == "define":
             self.define_block()
         elif start == "return":
-            self.parent.return_value = convert_variable(self, self.words[1])
+            scope = self.parent
+            while scope.parent:
+                scope = scope.parent
+
+            scope.return_value = convert_variable(self, self.words[1])
         elif start == "com":
             pass
 

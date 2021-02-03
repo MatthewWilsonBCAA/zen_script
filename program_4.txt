@@ -1,7 +1,13 @@
 define ( my_fun x string )
   ( display $string $x )
-  assign x math $x * 2
-  return $x
+  if $x == 23
+    assign x math $x * 3
+    return $x
+  else
+    assign x math $x * 2
+    ( display what is heckening )
+    return $x
+  end
 end
 
 assign y -1
