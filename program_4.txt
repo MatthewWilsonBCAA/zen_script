@@ -1,10 +1,14 @@
-assign y 50
-assign my_string str x in the local scope is
 define ( my_fun x string )
   ( display $string $x )
   assign x math $x * 2
   return $x
 end
+
+assign y 0
+assign my_string str x in the local scope is
+
+( display please enter a number )
+get y
 assign bean ( my_fun $y $my_string )
-( display hi )
-( display $bean )
+
+( display now it is $bean )

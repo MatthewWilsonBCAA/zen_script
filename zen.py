@@ -280,7 +280,7 @@ class Node:
         #         i += 1
         #     print(" ".join(string))
         elif start == "get":
-            global_variables[self.words[1]] = input(">")
+            global_variables[self.words[1]] = input()
         elif start == "else":
             self.run_block()
         elif start == "repeat":
