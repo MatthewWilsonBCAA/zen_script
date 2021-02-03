@@ -319,10 +319,7 @@ class Tree:
 
     def show_tree(self):
         for child in self.children:
-            if child.parent:
-                print(f"{child} <with parent> {child.parent}")
-            else:
-                print(child)
+            print(f"{child} <with parent> {child.parent}")
 
 
 my_file = open("program_4.txt", "r")
