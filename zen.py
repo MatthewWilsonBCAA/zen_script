@@ -28,20 +28,41 @@ zen_functions = dict()  # functions written in Zen by the end user!
 # end
 
 
+def assign_variable(obj, var, value):
+    scope = obj
+    if scope.parent:
+        scope.parent.local_variables[var] = value
+    else:
+        global_variables[var] = value
+    # reached_top = False
+    # looped_top = False
+    # while not looped_top:
+    #     if var in scope.local_variables.keys():
+    #         return scope.local_variables[var]
+    #     if reached_top:
+    #         looped_top = True
+    #     if scope.parent:
+    #         scope = scope.parent
+    #     else:
+    #         reached_top = True
+
+
 def convert_variable(obj, var):
     if not "$" in var:
         return var
     scope = obj
-    print("SCOPE PARENT", scope)
     var = var.replace("$", "")
-    while scope.parent:
+    reached_top = False
+    looped_top = False
+    while not looped_top:
         if var in scope.local_variables.keys():
-            print("SUCCESS")
             return scope.local_variables[var]
-        elif not scope.parent:
-            break
-        else:
+        if reached_top:
+            looped_top = True
+        if scope.parent:
             scope = scope.parent
+        else:
+            reached_top = True
 
     if var in global_variables.keys():
         return global_variables[var]
@@ -172,14 +193,17 @@ class Node:
             zen_functions[func].run_block()
 
     def interp(self):
-        start = self.words[0]
+        if self.words:
+            start = self.words[0]
+        else:
+            start = ""
         if start == "assign":
             if self.words[2] == "str":
                 string = list(self.words)
                 string.pop(0)
                 name = string.pop(0)
                 string.pop(0)
-                global_variables[name] = " ".join(string)
+                assign_variable(self, name, " ".join(string))
             elif self.words[2] == "math":
                 q_line = list(self.words)
                 q_line.pop(0)
@@ -217,7 +241,7 @@ class Node:
                         result = result ** number
                 if round(result) == result:
                     result = round(result)
-                global_variables[name] = str(result)
+                assign_variable(self, name, str(result))
             elif self.words[2] == "list":
                 q_line = list(self.words)
                 q_line.pop(0)
@@ -226,32 +250,27 @@ class Node:
                 result = []
                 for i in q_line:
                     result.append(convert_variable(self, i))
-                global_variables[name] = result
+                assign_variable(self, name, result)
             else:
-                global_variables[self.words[1]] = self.words[2]
-        elif start == "display":
-            i = 0
-            string = list(self.words)
-            string.pop(0)
-            lent = len(string)
-            while i < lent:
-                if "$" in string[i]:
-                    print(
-                        "PARENT VARS",
-                        self.parent.local_variables,
-                        "WORDS-I",
-                        self.words[i + 1],
-                    )
-                    string[i] = convert_variable(self, self.words[i + 1])
-                    if type(string[i]) == list:
-                        if string[i + 1] and "i/" in string[i + 1]:
-                            j = string[i + 1].replace("i/", "")
-                            string[i] = string[i][int(j)]
-                            string[i + 1] = "\b"
-                        else:
-                            string[i] = " ".join(string[i])
-                i += 1
-            print(" ".join(string))
+                assign_variable(self, self.words[1], self.words[2])
+
+        # elif start == "display":
+        #     i = 0
+        #     string = list(self.words)
+        #     string.pop(0)
+        #     lent = len(string)
+        #     while i < lent:
+        #         if "$" in string[i]:
+        #             string[i] = convert_variable(self, self.words[i + 1])
+        #             if type(string[i]) == list:
+        #                 if string[i + 1] and "i/" in string[i + 1]:
+        #                     j = string[i + 1].replace("i/", "")
+        #                     string[i] = string[i][int(j)]
+        #                     string[i + 1] = "\b"
+        #                 else:
+        #                     string[i] = " ".join(string[i])
+        #         i += 1
+        #     print(" ".join(string))
         elif start == "get":
             global_variables[self.words[1]] = input(">")
         elif start == "else":

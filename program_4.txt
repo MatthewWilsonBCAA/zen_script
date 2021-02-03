@@ -1,5 +1,8 @@
 assign y 50
-define ( my_fun x )
-  display $x
+assign my_string str x in the local scope is
+define ( my_fun x string )
+  ( display $string $x )
+  assign x math $x * 2
+  ( display now it is $x )
 end
-( my_fun $y )
+( my_fun $y $my_string )
