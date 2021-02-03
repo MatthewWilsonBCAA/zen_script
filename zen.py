@@ -79,6 +79,7 @@ class Node:
         self.has_children = False
         self.tree = tree
         self.local_variables = dict()
+        self.return_value = None
 
     def __str__(self):
         return " ".join(self.words)
@@ -178,8 +179,6 @@ class Node:
                     self.else_statement.run_block()
 
     def exec_function(self, item_list):
-        item_list.pop()
-        item_list.pop(0)
         func = item_list.pop(0)
         if func in static_functions.keys():
             static_functions[func](self, item_list)
@@ -191,6 +190,7 @@ class Node:
                 zen_functions[func].local_variables[args[i]] = j
                 i += 1
             zen_functions[func].run_block()
+            return zen_functions[func].return_value
 
     def interp(self):
         if self.words:
@@ -204,6 +204,14 @@ class Node:
                 name = string.pop(0)
                 string.pop(0)
                 assign_variable(self, name, " ".join(string))
+            elif self.words[2] == "(":
+                item_list = list(self.words)
+                item_list.pop(0)
+                item_list.pop()
+                name = item_list.pop(0)
+                item_list.pop(0)
+                # print("ITEM LIST", item_list)
+                assign_variable(self, name, self.exec_function(item_list))
             elif self.words[2] == "math":
                 q_line = list(self.words)
                 q_line.pop(0)
@@ -281,9 +289,14 @@ class Node:
         elif start == "if":
             self.if_block()
         elif start == "(":
-            self.exec_function(list(self.words))
+            item_list = list(self.words)
+            item_list.pop()
+            item_list.pop(0)
+            self.exec_function(item_list)
         elif start == "define":
             self.define_block()
+        elif start == "return":
+            self.parent.return_value = convert_variable(self, self.words[1])
         elif start == "com":
             pass
 

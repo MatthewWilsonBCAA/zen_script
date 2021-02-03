@@ -3,6 +3,8 @@ assign my_string str x in the local scope is
 define ( my_fun x string )
   ( display $string $x )
   assign x math $x * 2
-  ( display now it is $x )
+  return $x
 end
-( my_fun $y $my_string )
+assign bean ( my_fun $y $my_string )
+( display hi )
+( display $bean )
