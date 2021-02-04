@@ -1,15 +1,15 @@
 assign opening str y is:
 assign y math 3 + 2 * 2
 assign x 0
-display $opening $y
+( display $opening $y )
 com comments work!
 if $x != exit
-  display please enter a number, or 'exit' to exit
+  ( display please enter a number, or 'exit' to exit )
   get x
-  if $x = $y
-    display your input is equal to y
+  if $x == $y
+    ( display your input is equal to y )
   else
-    display your input is not equal to y
+    ( display your input is not equal to y )
   end
   repeat
 end

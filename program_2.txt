@@ -9,7 +9,7 @@ if $x <= $MAX_X
   if $y <= $MAX_Y
     assign y math $y + 1
     if $z <= $MAX_Z
-        display X: $x , Y: $y , Z: $z
+        ( display X: $x , Y: $y , Z: $z ()
         assign z math $z + 1
         repeat
     end

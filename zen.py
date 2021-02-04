@@ -1,3 +1,5 @@
+import sys
+
 global_variables = dict()
 
 
@@ -326,7 +328,7 @@ class Tree:
             print(f"{child} <with parent> {child.parent}")
 
 
-my_file = open("program_4.txt", "r")
+my_file = open(sys.argv[1], "r")
 code = []
 while True:
     cur_line = my_file.readline()

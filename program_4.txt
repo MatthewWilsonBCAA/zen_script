@@ -1,10 +1,16 @@
+define ( maf z )
+  com z = z * 2
+  assign z math $z * 2
+  return $z
+end
+
 define ( my_fun x string )
   ( display $string $x )
   if $x == 23
     assign x math $x * 3
     return $x
   else
-    assign x math $x * 2
+    assign x ( maf $x )
     ( display what is heckening )
     return $x
   end
@@ -22,5 +28,3 @@ if $y != 0
   end
   repeat
 end
-
-( display get help )
