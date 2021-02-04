@@ -52,7 +52,6 @@ def convert_variable(obj, var):
         return var
     scope = obj
     actual = None
-    print("SCOPE", scope, "PARENT", scope.parent)
     if scope.parent == scope:
         for item in scope.tree:
             if item.else_statement == scope:
@@ -76,6 +75,7 @@ def convert_variable(obj, var):
                 scope = scope.parent
             else:
                 scope = actual
+                actual = None
         elif scope.parent == None:
             reached_top = True
 
@@ -276,24 +276,6 @@ class Node:
                 assign_variable(self, name, result)
             else:
                 assign_variable(self, self.words[1], self.words[2])
-
-        # elif start == "display":
-        #     i = 0
-        #     string = list(self.words)
-        #     string.pop(0)
-        #     lent = len(string)
-        #     while i < lent:
-        #         if "$" in string[i]:
-        #             string[i] = convert_variable(self, self.words[i + 1])
-        #             if type(string[i]) == list:
-        #                 if string[i + 1] and "i/" in string[i + 1]:
-        #                     j = string[i + 1].replace("i/", "")
-        #                     string[i] = string[i][int(j)]
-        #                     string[i + 1] = "\b"
-        #                 else:
-        #                     string[i] = " ".join(string[i])
-        #         i += 1
-        #     print(" ".join(string))
         elif start == "get":
             global_variables[self.words[1]] = input()
         elif start == "else":
