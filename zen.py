@@ -31,7 +31,16 @@ zen_functions = dict()  # functions written in Zen by the end user!
 def assign_variable(obj, var, value):
     scope = obj
     if scope.parent:
+        while scope.parent.parent:
+            scope = scope.parent
+            if scope == scope.parent:
+                for item in scope.tree.children:
+                    if item.else_statement == scope:
+                        scope = item
+                        break
         scope.parent.local_variables[var] = value
+    elif scope.words[0] == "define":
+        scope.local_variables[var] = value
     else:
         global_variables[var] = value
 
