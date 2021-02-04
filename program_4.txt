@@ -6,8 +6,8 @@ define ( my_fun x string )
   else
     assign x math $x * 2
     ( display what is heckening )
-    return $x
   end
+  return $x
 end
 
 assign y -1

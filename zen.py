@@ -34,17 +34,6 @@ def assign_variable(obj, var, value):
         scope.parent.local_variables[var] = value
     else:
         global_variables[var] = value
-    # reached_top = False
-    # looped_top = False
-    # while not looped_top:
-    #     if var in scope.local_variables.keys():
-    #         return scope.local_variables[var]
-    #     if reached_top:
-    #         looped_top = True
-    #     if scope.parent:
-    #         scope = scope.parent
-    #     else:
-    #         reached_top = True
 
 
 def convert_variable(obj, var):
@@ -296,6 +285,11 @@ class Node:
             scope = self.parent
             while scope.parent:
                 scope = scope.parent
+                if scope.parent == scope:
+                    for item in scope.tree.children:
+                        if item.else_statement == scope:
+                            scope = item
+                            break
 
             scope.return_value = convert_variable(self, self.words[1])
         elif start == "com":
