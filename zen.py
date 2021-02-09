@@ -50,6 +50,14 @@ def assign_variable(obj, var, value):
             global_variables[var] = value
 
 
+# def evaluate_expression(item_list):
+#     function_call = None
+#     result = None
+#     if item_list[1] in zen_functions.keys():
+#         function_call = zen_functions[item_list[1]]
+#     return result
+
+
 def convert_variable(obj, var):
     if not "$" in var:
         return var
@@ -154,15 +162,48 @@ class Node:
                 self.tree.children[i].parent = self.else_statement
             i += 1
         left = self.words[1]
-        right = self.words[3]
-        if "$" in self.words[1]:
+        i = 3
+        if left == "(":
+            left = [self.words[1]]
+            i = 2
+            c = 1
+            while c > 0:
+                if self.words[i] == "(":
+                    c += 1
+                if self.words[i] == ")":
+                    c -= 1
+                left.append(self.words[i])
+                i += 1
+            left.pop(0)
+            left.pop()
+            left = self.exec_function(left)
+            i += 1
+        # print("i:", i)
+        # print(self.words)
+        right = self.words[i]
+        if right == "(":
+            right = [self.words[1]]
+            c = 1
+            while c > 0:
+                if self.words[i] == "(":
+                    c += 1
+                if self.words[i] == ")":
+                    c -= 1
+                right.append(self.words[i])
+                i += 1
+            right.pop(0)
+            right.pop()
+            right = self.exec_function(right)
+            i += 1
+        if "$" in left:
             left = convert_variable(self, self.words[1])
-        if "$" in self.words[3]:
+        if "$" in right:
             right = convert_variable(self, self.words[3])
         if self.words[2] == "==":
             if left == right:
                 self.run_block()
             else:
+                print("LR,", left, right)
                 if self.else_statement:
                     self.else_statement.run_block()
         if self.words[2] == "!=":

@@ -22,12 +22,32 @@ get choice
 global_assign level 1
 global_assign xp 0
 if $choice == 1
-    ( display choice: $choice )
     global_assign hp 50
     global_assign str 8
     global_assign dex 5
     global_assign pow 2
     global_assign spd 3
+end
+if $choice == 2
+    global_assign hp 40
+    global_assign str 4
+    global_assign dex 10
+    global_assign pow 3
+    global_assign spd 7
+end
+if $choice == 3
+    global_assign hp 45
+    global_assign str 2
+    global_assign dex 5
+    global_assign pow 8
+    global_assign spd 5
+end
+if $choice == 4
+    global_assign hp 10
+    global_assign str 1
+    global_assign dex 1
+    global_assign pow 1
+    global_assign spd 1
 end
 ( display HP $hp )
 ( showstats $name $hp $str $dex $pow $spd $xp $level )

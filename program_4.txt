@@ -11,7 +11,6 @@ define ( my_fun x string )
     return $x
   else
     assign x ( maf $x )
-    ( display what is heckening )
     return $x
   end
 end
@@ -23,7 +22,7 @@ if $y != 0
   ( display please enter a number, or 0 to exit )
   get y
   assign bean ( my_fun $y $my_string )
-  if $bean != 0
+  if ( my_fun $bean $my_string ) == ( my_fun $bean $my_string )
     ( display now it is $bean )
   end
   repeat
