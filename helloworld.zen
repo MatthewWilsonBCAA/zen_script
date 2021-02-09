@@ -19,11 +19,10 @@ assign choice 4
 ( display 3 - Wizard: 45 HP, 2 STR, 5 DEX, 8 POW, 5 SPD )
 ( display 4 - Deprived: 10 HP, 1 STR, 1 DEX, 1 POW, 1 SPD )
 get choice
-
+global_assign level 1
+global_assign xp 0
 if $choice == 1
     ( display choice: $choice )
-    global_assign level 1
-    global_assign xp 0
     global_assign hp 50
     global_assign str 8
     global_assign dex 5
