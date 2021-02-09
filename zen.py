@@ -182,9 +182,12 @@ class Node:
         # print(self.words)
         right = self.words[i]
         if right == "(":
-            right = [self.words[1]]
+            right = [self.words[i]]
+            i += 1
             c = 1
-            while c > 0:
+            lent = len(self.words)
+            while c > 0 and i < lent:
+                print("III", i)
                 if self.words[i] == "(":
                     c += 1
                 if self.words[i] == ")":
