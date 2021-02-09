@@ -32,19 +32,22 @@ zen_functions = dict()  # functions written in Zen by the end user!
 
 def assign_variable(obj, var, value):
     scope = obj
-    if scope.parent:
-        while scope.parent.parent:
-            scope = scope.parent
-            if scope == scope.parent:
-                for item in scope.tree.children:
-                    if item.else_statement == scope:
-                        scope = item
-                        break
-        scope.parent.local_variables[var] = value
-    elif scope.words[0] == "define":
-        scope.local_variables[var] = value
-    else:
+    if not scope:
         global_variables[var] = value
+    else:
+        if scope.parent:
+            while scope.parent.parent:
+                scope = scope.parent
+                if scope == scope.parent:
+                    for item in scope.tree.children:
+                        if item.else_statement == scope:
+                            scope = item
+                            break
+            scope.parent.local_variables[var] = value
+        elif scope.words[0] == "define":
+            scope.local_variables[var] = value
+        else:
+            global_variables[var] = value
 
 
 def convert_variable(obj, var):
@@ -212,13 +215,17 @@ class Node:
             start = self.words[0]
         else:
             start = ""
-        if start == "assign":
+        if start == "assign" or start == "global_assign":
+            if start == "assign":
+                obj = self
+            else:
+                obj = None
             if self.words[2] == "str":
                 string = list(self.words)
                 string.pop(0)
                 name = string.pop(0)
                 string.pop(0)
-                assign_variable(self, name, " ".join(string))
+                assign_variable(obj, name, " ".join(string))
             elif self.words[2] == "(":
                 item_list = list(self.words)
                 item_list.pop(0)
@@ -226,7 +233,7 @@ class Node:
                 name = item_list.pop(0)
                 item_list.pop(0)
                 # print("ITEM LIST", item_list)
-                assign_variable(self, name, self.exec_function(item_list))
+                assign_variable(obj, name, self.exec_function(item_list))
             elif self.words[2] == "math":
                 q_line = list(self.words)
                 q_line.pop(0)
@@ -264,7 +271,7 @@ class Node:
                         result = result ** number
                 if round(result) == result:
                     result = round(result)
-                assign_variable(self, name, str(result))
+                assign_variable(obj, name, str(result))
             elif self.words[2] == "list":
                 q_line = list(self.words)
                 q_line.pop(0)
@@ -273,9 +280,9 @@ class Node:
                 result = []
                 for i in q_line:
                     result.append(convert_variable(self, i))
-                assign_variable(self, name, result)
+                assign_variable(obj, name, result)
             else:
-                assign_variable(self, self.words[1], self.words[2])
+                assign_variable(obj, self.words[1], self.words[2])
         elif start == "get":
             global_variables[self.words[1]] = input()
         elif start == "else":

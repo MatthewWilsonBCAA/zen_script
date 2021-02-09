@@ -1,0 +1,35 @@
+define ( showstats n h st d p sp x l )
+    ( display $n , Level $l )
+    ( display XP: $x )
+    ( display Health: $h )
+    ( display Strength: $st )
+    ( display Dexterity: $d )
+    ( display Power: $p )
+    ( display Speed: $sp )
+end
+
+assign name Hero
+( display Rogue Arcade )
+( display Enter your name )
+get name
+assign choice 4
+( display Ok, $name , please choose your class: )
+( display 1 - Warrior: 50 HP, 8 STR, 5 DEX, 2 POW, 3 SPD )
+( display 2 - Assassin: 40 HP, 4 STR, 10 DEX, 3 POW, 7 SPD )
+( display 3 - Wizard: 45 HP, 2 STR, 5 DEX, 8 POW, 5 SPD )
+( display 4 - Deprived: 10 HP, 1 STR, 1 DEX, 1 POW, 1 SPD )
+get choice
+
+if $choice == 1
+    ( display choice: $choice )
+    global_assign level 1
+    global_assign xp 0
+    global_assign hp 50
+    global_assign str 8
+    global_assign dex 5
+    global_assign pow 2
+    global_assign spd 3
+end
+( display HP $hp )
+( showstats $name $hp $str $dex $pow $spd $xp $level )
+
