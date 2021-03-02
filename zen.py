@@ -187,7 +187,7 @@ class Node:
             c = 1
             lent = len(self.words)
             while c > 0 and i < lent:
-                print("III", i)
+                #print("III", i)
                 if self.words[i] == "(":
                     c += 1
                 if self.words[i] == ")":
